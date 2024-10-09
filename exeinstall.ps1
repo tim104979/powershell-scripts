@@ -8,4 +8,4 @@ $filePath = "C:\File.exe"
 Invoke-WebRequest -Uri $url -OutFile $filePath
 
 # Install the executable file using the Start-Process cmdlet
-Start-Process -FilePath $filePath -ArgumentList "/silent" -Wait
+Start-Process -FilePath $filePath -ArgumentList -Wait
