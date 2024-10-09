@@ -1,59 +1,16 @@
-# Define the URLs of the installation files
-$WinRarUrl = "https://www.win-rar.com/fileadmin/winrar-versions/winrar-x64-601.exe"
-$ChromeUrl = "https://dl.google.com/chrome/install/ChromeStandaloneSetup64.exe"
+winget install -e --id Google.Chrome
 
-# Define the destination paths for the files
-$WinRarDestination = "C:\WinRAR.exe"
-$ChromeDestination = "C:\Chrome.exe"
+ winget install -e --id RARLab.WinRAR
 
-# Download the files using BITS
-$WinRarJob = Start-BitsTransfer $WinRarUrl -Destination $WinRarDestination
-$ChromeJob = Start-BitsTransfer $ChromeUrl -Destination $ChromeDestination
+ winget install -e --id VMware.WorkstationPro
 
-# Wait for the downloads to complete
-while ($WinRarJob.JobState -eq "Transferring" -or $ChromeJob.JobState -eq "Transferring") {
-    Start-Sleep -Milliseconds 100
-}
+ winget install -e --id Microsoft.VisualStudioCode
 
-# Check the job states
-switch ($WinRarJob.JobState) {
-    'Transferred' {
-        # Complete the BITS transfer
-        Complete-BitsTransfer -BitsJob $WinRarJob
+ winget install -e --id PuTTY.PuTTY
 
-        # Install WinRAR
-        $WinRarArgs = '/S'
-        $workingDir = if ([Environment]::Is64BitOperatingSystem) { "C:\Windows\SysWOW64" } else { $env:SystemRoot }
-        Start-Process -Wait -WorkingDirectory $workingDir -FilePath $WinRarDestination -ArgumentList $WinRarArgs
+ winget install -e --id WinSCP.WinSCP
 
-        # Remove the file after installation
-        Remove-Item -Path $WinRarDestination -Force
-        break
-    }
+ winget install -e --id Discord.Discord
 
-    'Error' {
-        # Throw an error if the download fails
-        throw 'Error downloading WinRAR'
-    }
-}
-
-switch ($ChromeJob.JobState) {
-    'Transferred' {
-        # Complete the BITS transfer
-        Complete-BitsTransfer -BitsJob $ChromeJob
-
-        # Install Chrome
-        $ChromeArgs = '/silent /install'
-        $workingDir = if ([Environment]::Is64BitOperatingSystem) { "C:\Windows\SysWOW64" } else { $env:SystemRoot }
-        Start-Process -Wait -WorkingDirectory $workingDir -FilePath $ChromeDestination -ArgumentList $ChromeArgs
-
-        # Remove the file after installation
-        Remove-Item -Path $ChromeDestination -Force
-        break
-    }
-
-    'Error' {
-        # Throw an error if the download fails
-        throw 'Error downloading Chrome'
-    }
-}
+ winget install -e --id Microsoft.OfficeDeploymentTool
+ 
