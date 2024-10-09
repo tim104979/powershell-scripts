@@ -18,3 +18,5 @@ switch ($bitsJobObj.JobState) {
 $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
 
 Start-Process -Wait $Destination -ArgumentList $exeArgs
+
+Remove-Item -Path $Destination -Force
