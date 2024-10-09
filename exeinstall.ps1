@@ -1,4 +1,4 @@
-winget install -e --id Google.Chrome
+winget install -e --id Google.Chrome --ignore-security-hash
 
  winget install -e --id RARLab.WinRAR
 
