@@ -13,4 +13,5 @@ $LocalTempDir = $env:TEMP; $ChromeInstaller = "ChromeInstaller.exe"; (new-object
  winget install -e --id Discord.Discord
 
  winget install -e --id Microsoft.OfficeDeploymentTool
- 
+
+ winget upgrade -h --all
